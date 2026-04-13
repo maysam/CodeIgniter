@@ -34,6 +34,9 @@ Services:
 
 For local machine testing with direct host access, temporarily add a `ports` mapping (for example `8080:80`) to `weblog`.
 
+Deployment note:
+- The `weblog` service intentionally does not use a source bind mount in compose so Apache serves the image contents reliably in orchestration environments.
+
 MySQL schema + seed data load automatically from:
 - `docker/mysql/init/01_schema.sql`
 

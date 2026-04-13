@@ -1,13 +1,13 @@
 # Plan
 
 ## Current Prompt
-Fix deployment failure caused by host port allocation conflict in Docker Compose.
+Fix deployment/runtime web 403 issues seen in container logs.
 
 ## Steps
-1. Analyze deployment logs for root cause.
-2. Remove fixed host port mappings in compose.
-3. Update README and changelog for deployment behavior.
-4. Mark plan completion for this prompt.
+1. Analyze Apache and deployment logs for root cause.
+2. Adjust compose runtime mapping behavior.
+3. Correct front-controller bootstrap if needed.
+4. Update docs and tracking files.
 
 ## Status
 - Completed on 2026-04-13.
@@ -15,3 +15,4 @@ Fix deployment failure caused by host port allocation conflict in Docker Compose
 - Converted static blog into a MySQL-backed training weblog with auth, comments, and admin CRUD.
 - Imported official CodeIgniter 2.2.0 framework core from upstream release URL.
 - Deployment compose configuration adjusted to avoid host port conflicts.
+- Deployment runtime updated to avoid web-root mismatch and bootstrap header issue.
