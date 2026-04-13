@@ -3,8 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8080:80"
+    expose:
+      - "80"
     depends_on:
       - mysql
     environment:
@@ -20,8 +20,8 @@ services:
       MYSQL_DATABASE: ci_weblog
       MYSQL_USER: ci_user
       MYSQL_PASSWORD: ci_password
-    ports:
-      - "33066:3306"
+    expose:
+      - "3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d

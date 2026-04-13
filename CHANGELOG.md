@@ -19,3 +19,4 @@
 - Updated `PLAN.md` to reflect and close the current prompt scope.
 - Imported official CodeIgniter `2.2.0` framework core into `system/` from the upstream release source.
 - Updated `README.md` with the exact upstream release URL used for framework core sourcing.
+- Replaced fixed host port bindings in `docker-compose.yaml` with `expose` to prevent deployment-time port collision (`8080 already allocated`).

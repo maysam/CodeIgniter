@@ -29,8 +29,10 @@ docker compose up --build
 ```
 
 Services:
-- App: Apache + PHP at `localhost:8080`
-- MySQL: `localhost:33066` (db `ci_weblog`, user `ci_user`, pass `ci_password`)
+- App: Apache + PHP exposed on container port `80` (ingress/proxy should route traffic)
+- MySQL: container port `3306` inside compose network (`ci_weblog`, `ci_user`, `ci_password`)
+
+For local machine testing with direct host access, temporarily add a `ports` mapping (for example `8080:80`) to `weblog`.
 
 MySQL schema + seed data load automatically from:
 - `docker/mysql/init/01_schema.sql`
