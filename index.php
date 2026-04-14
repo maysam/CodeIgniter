@@ -1,5 +1,21 @@
 <?php
 
+define('ENVIRONMENT', getenv('CI_ENV') ? getenv('CI_ENV') : 'development');
+
+switch (ENVIRONMENT) {
+    case 'development':
+        error_reporting(E_ALL);
+        break;
+
+    case 'testing':
+    case 'production':
+        error_reporting(0);
+        break;
+
+    default:
+        exit('The application environment is not set correctly.');
+}
+
 $system_path = 'system';
 $application_folder = 'application';
 
@@ -18,10 +34,19 @@ if (!is_dir($system_path)) {
 }
 
 define('SELF', pathinfo(__FILE__, PATHINFO_BASENAME));
+define('EXT', '.php');
 define('BASEPATH', str_replace('\\', '/', $system_path));
 define('FCPATH', str_replace(SELF, '', __FILE__));
 define('SYSDIR', trim(strrchr(trim(BASEPATH, '/'), '/'), '/'));
 
-define('APPPATH', $application_folder.'/');
+if (is_dir($application_folder)) {
+    define('APPPATH', $application_folder.'/');
+} else {
+    if (!is_dir(BASEPATH.$application_folder.'/')) {
+        exit("Your application folder path does not appear to be set correctly. Please open the following file and correct this: ".SELF);
+    }
+
+    define('APPPATH', BASEPATH.$application_folder.'/');
+}
 
 require_once BASEPATH.'core/CodeIgniter.php';
