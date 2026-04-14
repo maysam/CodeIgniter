@@ -7,7 +7,7 @@ services:
       MYSQL_USER: ci_user
       MYSQL_PASSWORD: ci_password
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD $$MYSQL_DATABASE -e 'SELECT 1' >/dev/null 2>&1"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -22,15 +22,17 @@ services:
       mysql:
         condition: service_healthy
     environment:
-      MYSQL_HOST: mysql
-      MYSQL_ROOT_PASSWORD: root
+      DB_HOST: mysql
+      DB_NAME: ci_weblog
+      DB_USER: ci_user
+      DB_PASSWORD: ci_password
     volumes:
       - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
     entrypoint:
       - sh
       - -ec
       - |
-        mysql -h "$$MYSQL_HOST" -uroot -p"$$MYSQL_ROOT_PASSWORD" < /docker-entrypoint-initdb.d/01_schema.sql
+        mysql -h "$$DB_HOST" -u "$$DB_USER" -p"$$DB_PASSWORD" "$$DB_NAME" < /docker-entrypoint-initdb.d/01_schema.sql
     restart: "no"
 
   weblog:
