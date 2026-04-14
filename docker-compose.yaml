@@ -1,33 +1,65 @@
 services:
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ci_weblog
+      MYSQL_USER: ci_user
+      MYSQL_PASSWORD: ci_password
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+
+  mysql-bootstrap:
+    image: mysql:5.7
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_DATABASE: ci_weblog
+      MYSQL_USER: ci_user
+      MYSQL_PASSWORD: ci_password
+    entrypoint:
+      - sh
+      - -ec
+      - |
+        mysql -h "$$MYSQL_HOST" -u "$$MYSQL_USER" -p"$$MYSQL_PASSWORD" "$$MYSQL_DATABASE" <<'SQL'
+        CREATE TABLE IF NOT EXISTS ci_sessions (
+          session_id VARCHAR(40) NOT NULL DEFAULT '0',
+          ip_address VARCHAR(45) NOT NULL DEFAULT '0',
+          user_agent VARCHAR(120) NOT NULL,
+          last_activity INT UNSIGNED NOT NULL DEFAULT 0,
+          user_data TEXT NOT NULL,
+          PRIMARY KEY (session_id),
+          KEY last_activity_idx (last_activity)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        SQL
+    restart: "no"
+
   weblog:
     build:
       context: .
       dockerfile: Dockerfile
-    expose:
-      - "80"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+      mysql-bootstrap:
+        condition: service_completed_successfully
     environment:
       CI_ENV: development
       DB_HOST: mysql
       DB_NAME: ci_weblog
       DB_USER: ci_user
       DB_PASSWORD: ci_password
-      DB_PORT: 3306
-
-  mysql:
-    image: mysql:5.7
-    command: --default-authentication-plugin=mysql_native_password
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: ci_weblog
-      MYSQL_USER: ci_user
-      MYSQL_PASSWORD: ci_password
-    expose:
-      - "3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    ports:
+      - "${APP_PORT:-8080}:80"
 
 volumes:
   mysql_data:
