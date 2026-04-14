@@ -26,21 +26,13 @@ services:
       MYSQL_DATABASE: ci_weblog
       MYSQL_USER: ci_user
       MYSQL_PASSWORD: ci_password
+    volumes:
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
     entrypoint:
       - sh
       - -ec
       - |
-        mysql -h "$$MYSQL_HOST" -u "$$MYSQL_USER" -p"$$MYSQL_PASSWORD" "$$MYSQL_DATABASE" <<'SQL'
-        CREATE TABLE IF NOT EXISTS ci_sessions (
-          session_id VARCHAR(40) NOT NULL DEFAULT '0',
-          ip_address VARCHAR(45) NOT NULL DEFAULT '0',
-          user_agent VARCHAR(120) NOT NULL,
-          last_activity INT UNSIGNED NOT NULL DEFAULT 0,
-          user_data TEXT NOT NULL,
-          PRIMARY KEY (session_id),
-          KEY last_activity_idx (last_activity)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        SQL
+        mysql -h "$$MYSQL_HOST" -u "$$MYSQL_USER" -p"$$MYSQL_PASSWORD" "$$MYSQL_DATABASE" < /docker-entrypoint-initdb.d/01_schema.sql
     restart: "no"
 
   weblog:
