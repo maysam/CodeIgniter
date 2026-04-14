@@ -1,3 +1,4 @@
+CREATE DATABASE IF NOT EXISTS ci_weblog;
 USE ci_weblog;
 
 CREATE TABLE IF NOT EXISTS users (

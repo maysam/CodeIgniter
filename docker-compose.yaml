@@ -23,16 +23,14 @@ services:
         condition: service_healthy
     environment:
       MYSQL_HOST: mysql
-      MYSQL_DATABASE: ci_weblog
-      MYSQL_USER: ci_user
-      MYSQL_PASSWORD: ci_password
+      MYSQL_ROOT_PASSWORD: root
     volumes:
       - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
     entrypoint:
       - sh
       - -ec
       - |
-        mysql -h "$$MYSQL_HOST" -u "$$MYSQL_USER" -p"$$MYSQL_PASSWORD" "$$MYSQL_DATABASE" < /docker-entrypoint-initdb.d/01_schema.sql
+        mysql -h "$$MYSQL_HOST" -uroot -p"$$MYSQL_ROOT_PASSWORD" < /docker-entrypoint-initdb.d/01_schema.sql
     restart: "no"
 
   weblog:
